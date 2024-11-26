@@ -53,6 +53,8 @@ cpm - a fast CPAN module installer
         directory to install modules into, default: local/
   -g, --global
         install modules into current @INC instead of local/
+  -q, --quiet
+        quiet mode; suppress standard output
   -v, --verbose
         verbose mode; you can see what is going on
       --prebuilt, --no-prebuilt

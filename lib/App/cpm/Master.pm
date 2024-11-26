@@ -163,6 +163,7 @@ sub _show_progress {
     my $self = shift;
     my $all = keys %{$self->{distributions}};
     my $num = $self->installed_distributions;
+    return if $App::cpm::Logger::QUIET;
     print STDERR "--- $num/$all ---";
     STDERR->flush; # this is needed at least with perl <= 5.24
 }

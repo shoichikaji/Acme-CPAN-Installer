@@ -83,6 +83,7 @@ sub parse_options {
         "g|global" => \($self->{global}),
         "mirror=s" => \$mirror,
         "v|verbose" => \($self->{verbose}),
+        "q|quiet" => \($self->{quiet}),
         "w|workers=i" => \($self->{workers}),
         "target-perl=s" => \my $target_perl,
         "test!" => sub { $self->{notest} = $_[1] ? 0 : 1 },
@@ -139,9 +140,13 @@ sub parse_options {
     if ($self->{pureperl_only} or $self->{sudo} or !$self->{notest} or $self->{man_pages} or $] < 5.012) {
         $self->{prebuilt} = 0;
     }
+    if ($self->{verbose} && $self->{quiet}) {
+        die "--quiet option conflicts with --verbose option\n";
+    }
 
     $App::cpm::Logger::COLOR = 1 if $self->{color};
     $App::cpm::Logger::VERBOSE = 1 if $self->{verbose};
+    $App::cpm::Logger::QUIET = 1 if $self->{quiet};
     $App::cpm::Logger::SHOW_PROGRESS = 1 if $self->{show_progress};
 
     if (@ARGV) {
@@ -283,6 +288,7 @@ sub cmd_install {
 
     my $worker = App::cpm::Worker->new(
         verbose   => $self->{verbose},
+        quiet     => $self->{quiet},
         home      => $self->{home},
         logger    => $logger,
         notest    => $self->{notest},

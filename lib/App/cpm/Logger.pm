@@ -7,6 +7,7 @@ use List::Util 'max';
 
 our $COLOR;
 our $VERBOSE;
+our $QUIET;
 our $SHOW_PROGRESS;
 
 my %color = (
@@ -35,6 +36,7 @@ sub log {
     my $result = $option{result};
     my $is_color = ref $self ? $self->{color} : $COLOR;
     my $verbose = ref $self ? $self->{verbose} : $VERBOSE;
+    my $quiet = ref $self ? $self->{quiet} : $QUIET;
     my $show_progress = ref $self ? $self->{show_progress} : $SHOW_PROGRESS;
 
     if ($is_color and WIN32) {
@@ -55,7 +57,7 @@ sub log {
         # type -> 5 + 9 + 3
         $type = $is_color && $type ? sprintf("%-17s", $type) : sprintf("%-9s", $type || "");
         warn $r . sprintf "%d %s %s %s%s\n", $option{pid} || $$, $result, $type, $message, $optional;
-    } else {
+    } elsif (!$quiet) {
         warn $r . join(" ", $result, $type ? $type : (), $message . $optional) . "\n";
     }
 }
