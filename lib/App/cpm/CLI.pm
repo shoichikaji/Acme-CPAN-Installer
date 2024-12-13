@@ -43,7 +43,7 @@ sub new {
         dependency_file => undef,
         local_lib => "local",
         cpanmetadb => "https://cpanmetadb.plackperl.org/v1.0/",
-        _default_mirror => 'https://cpan.metacpan.org/',
+        _default_mirror => $ENV{PERL_CPM_MIRROR} // 'https://cpan.metacpan.org/',
         retry => 1,
         configure_timeout => 60,
         build_timeout => 3600,
