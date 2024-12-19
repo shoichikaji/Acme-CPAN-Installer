@@ -213,9 +213,22 @@ sub fetch {
 
     chdir $dir or die;
 
-    my $meta = $self->_load_metafile($distfile, 'META.json', 'META.yml');
+    my @accepted_meta_files = ('META.json', 'META.yml', 'MYMETA.json', 'MYMETA.yml');
+
+    if (!grep -f, \@accepted_meta_files && grep -f, [ 'Makefile.PL', 'Build.PL' ]) {
+        my $makefile = (-f 'Makefile.PL' ? 'Makefile' : 'Build');
+        $self->{logger}->log("Configuring distribution via $makefile.PL");
+        my @cmd = ($self->{menlo}->{perl}, "$makefile.PL");
+        push @cmd, 'PUREPERL_ONLY=1' if $self->{pureperl_only};
+        $self->_retry(sub {
+            $self->{menlo}->configure(\@cmd, $self->{menlo_dist}, 1);
+            -f $makefile;
+        });
+    }
+
+    my $meta = $self->_load_metafile($distfile, @accepted_meta_files);
     if (!$meta) {
-        $self->{logger}->log("Distribution does not have META.json nor META.yml");
+        $self->{logger}->log("Distribution lacks both META.json and META.yml files, and neither MYMETA.json nor MYMETA.yml can be generated");
         return;
     }
     my $p = $meta->{provides} || $self->menlo->extract_packages($meta, ".");
